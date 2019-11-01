@@ -5,13 +5,16 @@ $('#name').focus();
 $('#other-title').hide();
 
 // T-Shirt section 
-// The goal for the t-shirt section is to filter the available "Color" options by the selected theme in
-// the "Design" field. Doing this ensures that the user cannot select an invalid combination of
-// values for the "Design" and "Color" fields.
-// When the form is initially loaded, we need to update the "Design" and "Color" fields so that it's
-// clear to the user that they need to select a theme before selecting a color. Use jQuery to:
+// The goal for the t-shirt section is to filter the available "Color" options by the selected theme in the "Design" field. Doing this ensures that the user cannot select an invalid combination of values for the "Design" and "Color" fields.
+
+// When the form is initially loaded, we need to update the "Design" and "Color" fields so that it's clear to the user that they need to select a theme before selecting a color. 
+// Use jQuery to:
 // ● Hide the “Select Theme” `option` element in the “Design” menu.
+$('#design').children(":first").hide();
+
 // ● Update the “Color” field to read “Please select a T-shirt theme”.
+$('#color').prepend("<option selected>Please select a T-shirt theme</option>").children(":first").hide();
+
 // ● Hide the colors in the “Color” drop down menu.
 // ● NOTE: Be sure to check out the helpful links in the second section of this Study Guide if
 // you’re unsure of how to accomplish these steps.
