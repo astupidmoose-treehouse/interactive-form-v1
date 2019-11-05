@@ -1,35 +1,59 @@
+// Define variables + regex conditions:
+const jsPunsString = /JS Puns/;
+const heartJS = /I ♥ JS/;
+
+let totalCost = 0;
+
 // Use jQuery to select the 'Name' input element and place focus on it.
-$('#name').focus();
+$("#name").focus();
 
-// In your JavaScript file, target the ‘Other’ input field, and hide it initially, so that it will display if JavaScript is disabled, but be hidden initially with JS.
-$('#other-title').hide();
+// Target the ‘Other’ input field, and hide it initially, so that it will display if JavaScript is disabled, but be hidden initially with JS.
+$("#other-title").hide();
 
-// T-Shirt section 
+// T-Shirt section
 // The goal for the t-shirt section is to filter the available "Color" options by the selected theme in the "Design" field. Doing this ensures that the user cannot select an invalid combination of values for the "Design" and "Color" fields.
 
-// When the form is initially loaded, we need to update the "Design" and "Color" fields so that it's clear to the user that they need to select a theme before selecting a color. 
+// When the form is initially loaded, we need to update the "Design" and "Color" fields so that it's clear to the user that they need to select a theme before selecting a color.
 // Use jQuery to:
 // ● Hide the “Select Theme” `option` element in the “Design” menu.
-$('#design').children(":first").hide();
+$("#design")
+	.children(":first")
+	.hide();
 
 // ● Update the “Color” field to read “Please select a T-shirt theme”.
-$('#color').prepend("<option selected>Please select a T-shirt theme</option>").children(":first").hide();
+$("#color")
+	.prepend("<option selected>Please select a T-shirt theme</option>")
+	.children(":first")
+	.hide();
 
 // ● Hide the colors in the “Color” drop down menu.
-// ● NOTE: Be sure to check out the helpful links in the second section of this Study Guide if
-// you’re unsure of how to accomplish these steps.
-// Then, when one of the two themes is selected, only the appropriate colors should show in the
-// “Color” drop down menu, and the “Color” field should update to the first available color. You’ll
-// use a `change` event listener on the “Design” menu `select` element to listen for changes. And
-// inside the event listener, you’ll use a conditional to determine what to hide, show and update.
-// ● If “js puns” is selected, hide the three “heart js” option elements in the “Color” drop
-// down menu, show the three “js puns” option elements, and update the “Color” field to
-// the first available color.
-// If “heart js” is selected, hide the three “js puns” option elements in the “Color” drop
-// down menu, show the three “heart js” option elements, and update the “Color” field to
-// the first available color.
+$("#color")
+	.children()
+	.hide();
 
+// Create a function to: Find all color options, hide them, then check if they contain the needed string for showing them.
+function showColors(colorString) {
+	$("#color")
+		.children()
+		.each(function() {
+			$(this).hide();
+			if (colorString.test($(this).text())) {
+				$(this).show();
+			}
+		});
+}
 
+// Change trigger for design element.
+$("#design").change(function() {
+	// Reset the color to the default
+	$("#color").prop("selectedIndex", 0);
+	// check which design is selected, and show colors accordingly.
+	if ($("#design option:selected").text() === "Theme - JS Puns") {
+		showColors(jsPunsString);
+	} else {
+		showColors(heartJS);
+	}
+});
 
 // Activity section
 // Like many code problems, there are multiple ways to complete this section of the project. One
@@ -40,41 +64,31 @@ $('#color').prepend("<option selected>Please select a T-shirt theme</option>").c
 // cost element you create, depending on whether the checkbox was checked or unchecked.
 // But a preferred approach would be to come up with a dynamic solution that will work even if
 // the cost, day or time of the activities were changed in the HTML. To do that, we'll:
-// ● Create an element to display the total activity cost
-// ● Listen for changes in the Activity section
-// ● Create helpful variables to store important values
-// ● Update and display the total activity cost
-// ● Disable conflicting activities
+
 
 
 // Creating an element to display the total activity cost
-// Create a DOM element, store it in a global variable and append it to the `.activity` section. You
-// can view the elements tab in the Chrome DevTools to check that your element is in the DOM.
-// Create a global variable to store total activity cost — initially set to 0 — don't use const since
-// you want to update this as needed.
+$(".activities").append("<div id='total-cost'></div>");
 
+function runningTotal (totalCost){
+    $("#total-cost").text("The total cost of your activities is $" + totalCost);
+}
 
 // Listening for changes in the activity section
-// Add a change event listener to the activity section. Inside the listener, it will be helpful to have
-// a variable to reference the DOM `input` element that was just clicked.
-// ● NOTE: It is helpful at this point to log out the variable you just created to double check
-// that its values is what you expect. Remember, you’ll need to click on the checkboxes in
-// the Activity section to run the code in this listener, including your log statements.
+// Add a change event listener to the activity section.
 
+$(".activities input").change(function(event) {
+    let activityInput = event.target;
+    let cost = parseInt($(activityInput).attr("data-cost").replace(/[^0-9\.]+/g, ""));
 
-// Updating and displaying the total activity cost
-// Let’s add another helpful variable in the Activity section’s change listener:
-// ● Get the `data-cost` attribute value of the clicked element stored in the variable above.
-// Since you’ll be performing some simple arithmetic with the activity cost, you’ll need to
-// make sure the value is a number. There are helpful methods for turning strings into
-// numbers, which can be found with a Google search. And the `typeof` operator can be
-// used to log out the data type of a value or variable.
-// ● NOTE: Again, it’s helpful here to log out the cost variable.
-// Still inside the Activity section’s change listener, you can use an `if/else` statement to check if
-// the clicked input element is checked or unchecked. If the input element is checked, add the cost
-// of the currently clicked activity to the total cost variable, else subtract the cost.
-// Finally, set the text of the total cost element (that you created above) equal to the string ‘Total:
-// $’ concatenated with the current value of the total cost variable (that you declared above).
+    if (this.checked){
+        totalCost += cost;
+        runningTotal(totalCost);
+    } else {
+        totalCost -= cost;
+        runningTotal(totalCost);
+    }
+});
 
 
 // Disabling conflicting activities
@@ -112,19 +126,39 @@ $('#color').prepend("<option selected>Please select a T-shirt theme</option>").c
 // property to `false`.
 
 
+
+
 // Payment Section
 // Initially, the credit card section should be selected and displayed in the form, and the other two
 // payment options should be hidden. The user should be able to change payment options at any
 // time, but shouldn’t be able to select the “Select Payment Method” option. So you’ll need to
 // check the currently selected payment option, and hide and show the payment sections in the
 // form accordingly.
-// ● Hide the “Select Payment Method” `option` so it doesn’t show up in the drop down
-// menu.
+
+// ● Hide the “Select Payment Method” `option` so it doesn’t show up in the drop down menu.
+$("#payment")
+	.prop("selectedIndex", 1)
+	.children(":first")
+	.hide();
+$("#bitcoin").hide();
+$("#paypal").hide();
+
 // ● Get the value of the payment select element, and if it’s equal to ‘credit card’, set the
 // credit card payment section in the form to show, and set the other two options to hide.
-// ● Repeat the above step with the PayPal and BitCoin options so that the selected
-// payment is shown and the others are hidden.
 
+$("#payment").change(function() {
+	checkPaymentMethod = $("#payment option:selected").text();
+	$("#credit-card").hide();
+	$("#bitcoin").hide();
+	$("#paypal").hide();
+	if (checkPaymentMethod === "Credit Card") {
+		$("#credit-card").show();
+	} else if (checkPaymentMethod === "PayPal") {
+		$("#paypal").show();
+	} else if (checkPaymentMethod === "Bitcoin") {
+		$("#bitcoin").show();
+	}
+});
 
 
 // Form Validation and Validation Messages
