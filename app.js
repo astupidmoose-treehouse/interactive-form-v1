@@ -10,6 +10,31 @@ $("#name").focus();
 // Target the ‘Other’ input field, and hide it initially, so that it will display if JavaScript is disabled, but be hidden initially with JS.
 $("#other-title").hide();
 
+$("#title").change(function() {
+	checkTitleName = $("#title option:selected").text();
+	if (checkTitleName === "Other") {
+		$("#other-title").show();
+	} else {
+		$("#other-title").hide();
+	}
+	
+})
+
+// $("#payment").change(function() {
+// 	checkPaymentMethod = $("#payment option:selected").text();
+// 	$("#credit-card").hide();
+// 	$("#bitcoin").hide();
+// 	$("#paypal").hide();
+// 	if (checkPaymentMethod === "Credit Card") {
+// 		$("#credit-card").show();
+// 	} else if (checkPaymentMethod === "PayPal") {
+// 		$("#paypal").show();
+// 	} else if (checkPaymentMethod === "Bitcoin") {
+// 		$("#bitcoin").show();
+// 	}
+// });
+
+
 // T-Shirt section
 // The goal for the t-shirt section is to filter the available "Color" options by the selected theme in the "Design" field. Doing this ensures that the user cannot select an invalid combination of values for the "Design" and "Color" fields.
 
@@ -65,68 +90,52 @@ $("#design").change(function() {
 // But a preferred approach would be to come up with a dynamic solution that will work even if
 // the cost, day or time of the activities were changed in the HTML. To do that, we'll:
 
-
-
 // Creating an element to display the total activity cost
 $(".activities").append("<div id='total-cost'></div>");
 
-function runningTotal (totalCost){
-    $("#total-cost").text("The total cost of your activities is $" + totalCost);
+function runningTotal(totalCost) {
+	$("#total-cost").text("The total cost of your activities is $" + totalCost);
 }
+runningTotal(totalCost);
 
 // Listening for changes in the activity section
 // Add a change event listener to the activity section.
 
 $(".activities input").change(function(event) {
-    let activityInput = event.target;
-    let cost = parseInt($(activityInput).attr("data-cost").replace(/[^0-9\.]+/g, ""));
+	// set the element that was just clicked
+	let activityInput = event.target;
+	// set that elements cost as an Int
+	let cost = parseInt(
+		$(activityInput)
+			.attr("data-cost")
+			.replace(/[^0-9\.]+/g, "")
+	);
 
-    if (this.checked){
-        totalCost += cost;
-        runningTotal(totalCost);
-    } else {
-        totalCost -= cost;
-        runningTotal(totalCost);
-    }
+	// loop through all inputs, for each of them, log the date/time, check if the conditions match
+	$(".activities input").each(function() {
+		if (
+			$(this).attr("data-day-and-time") ===
+				$(activityInput).attr("data-day-and-time") &&
+			$(this).attr("name") !== $(activityInput).attr("name")
+		) {
+			if (activityInput.checked) {
+				$(this).prop("disabled", true);
+			} else {
+				$(this).prop("disabled", false);
+			}
+		}
+	});
+
+	// if the target is checked, add the cost to total
+	if (activityInput.checked) {
+		totalCost += cost;
+		runningTotal(totalCost);
+		// if the target is unchecked, subtract the cost.
+	} else {
+		totalCost -= cost;
+		runningTotal(totalCost);
+	}
 });
-
-
-// Disabling conflicting activities
-// Still inside the Activity section’s change listener, let’s follow the same pattern we used to get
-// the cost of the currently clicked activity to get the day and time as well. First, we’ll add another
-// helpful variable:
-// ● Get the `data-day-and-time` attribute value of the clicked element stored in a variable
-// above. NOTE: Now would be a good time to log out these most recent variables to
-// make sure they are what you think they are.
-// Now you need to accomplish the following tasks:
-// ● When an activity is checked, disable any activity that occurs at the same day and time
-// (i.e. "conflicting activities") without disabling the activity that was just checked.
-// ● And when an activity is unchecked, you want to enable any conflicting activities.
-// To do this, you’ll need to loop over all the checkbox inputs in the Activity section. It will be
-// helpful to create a variable that targets the activity input element at the current iteration of the
-// loop. Remember, you do this with bracket notation, using the loop iterator in the brackets.
-// Something like this: `input[i]`. Be sure to log out the variable you just created to test its value.
-// Now that you’re looping over each activity, and capturing each one in a variable, it’s time to test
-// a few conditions. In order to disable or enable an activity in the loop, you need to know two
-// things about the activity at the current loop iteration:
-// ● First, does the activity occur at the same day and time as the activity that was just
-// clicked? We can check this by seeing if the activity in the current loop iteration has a
-// `data-day-and-time` attribute that is equal to the `data-day-and-time` attribute of the
-// element that was just clicked .
-// ● Second, is the activity is different than the activity that was just clicked? We can check
-// this by seeing if the activity that was just clicked is not equal to the activity in the
-// current loop iteration.
-// Both of these conditions should be checked in a single if statement using the `&&` operator.
-// If both conditions evaluate to "true", then this activity needs to be disabled or enabled
-// depending on whether the clicked activity was checked or unchecked. An `if/else` statement
-// will help here:
-// ● If the clicked activity was checked, then set the matching activity element's `disabled`
-// property to `true`
-// ● If the clicked activity was unchecked, then set the matching activity element's `disabled`
-// property to `false`.
-
-
-
 
 // Payment Section
 // Initially, the credit card section should be selected and displayed in the form, and the other two
@@ -161,6 +170,7 @@ $("#payment").change(function() {
 });
 
 
+
 // Form Validation and Validation Messages
 // There are numerous ways to accomplish this part of the project. You could try to cram all the
 // programming for this section into the submit event listener.
@@ -169,21 +179,37 @@ $("#payment").change(function() {
 // You could separate the validation and validation messages into separate tasks handled
 // independently of each other. But it's generally a good idea to start with the simplest possible
 // solution. Here’s an example of a straightforward approach that takes it one step at a time.
-// There are three sections of the form that are always required: name, email and activities. The
-// credit section—comprised of three inputs—only needs to be validated if “credit card” is the
+
+
+// There are three sections of the form that are always required: name, email and activities. 
+
+// The credit section—comprised of three inputs—only needs to be validated if “credit card” is the
 // selected payment method. To keep things simple, you can create a function to validate each
 // required section, as well as add and remove a validation error indicator of some sort. Each
 // required section will need to be tested to see if it meets certain criteria, which are detailed in the
 // project instructions. If the criteria are not met, the validation function should add a validation
 // error indication for that field and return false. Else, the function should remove any validation
 // error indicator and return true.
+
+
 // ● Create a separate validation function for each of the required form fields or sections
 // ○ Name
-// ○ Email
-// ○ Activity Section
-// ○ Credit Card Number (only validated if the payment method is “credit card”)
-// ○ Zip Code (only validated if the payment method is “credit card”)
-// ○ CVV (only validated if the payment method is “credit card”)
+
+
+function validName(nameField){
+	if(nameField === "Mike"){
+		$("input#name").css("backgroundColor", "green");
+		console.log("Mike");
+	} else {
+		$("input#name").css("border", "2px solid red").after("<p style='color:red;'>Please enter a valid name!</p>");
+		console.log("Not Mike");
+	}
+}
+
+validName("Bob");
+
+
+
 // ● Each validation function will accomplish a similar set of tasks for its required field
 // ○ Use a conditional to check if the input value meets the requirements for that
 // input as stated in the project instructions.
@@ -193,6 +219,26 @@ $("#payment").change(function() {
 // section’s border red. But an even better approach is to append an element to
 // the DOM near the input or section, give it some friendly error message, and
 // show it when the field is invalid, and hide it when the field is valid.
+
+
+
+// ○ Activity Section
+// ○ Credit Card Number (only validated if the payment method is “credit card”)
+// ○ Zip Code (only validated if the payment method is “credit card”)
+// ○ CVV (only validated if the payment method is “credit card”)
+
+
+// ● Each validation function will accomplish a similar set of tasks for its required field
+// ○ Use a conditional to check if the input value meets the requirements for that
+// input as stated in the project instructions.
+// ○ If the criteria are not met, add an error indicator and return false.
+// ○ If the criteria are met, remove any error indicators and return true.
+// ○ NOTE: A common error indicator for an invalid field is to turn the input or form
+// section’s border red. But an even better approach is to append an element to
+// the DOM near the input or section, give it some friendly error message, and
+// show it when the field is invalid, and hide it when the field is valid.
+
+
 // ● With the individual validation functions complete, a single master validation function can
 // now be created to test them all with a single function call. If all the individual validation
 // functions return true, then the master validation function should return true as well.
