@@ -10,6 +10,7 @@ $("#name").focus();
 // Target the ‘Other’ input field, and hide it initially, so that it will display if JavaScript is disabled, but be hidden initially with JS.
 $("#other-title").hide();
 
+// If the other selection is made, show the other input field, else hide it. 
 $("#title").change(function() {
 	checkTitleName = $("#title option:selected").text();
 	if (checkTitleName === "Other") {
@@ -45,6 +46,10 @@ $("#design")
 	.children(":first")
 	.hide();
 
+// Hide Color form until selected
+
+$("#color").hide();
+
 // ● Update the “Color” field to read “Please select a T-shirt theme”.
 $("#color")
 	.prepend("<option selected>Please select a T-shirt theme</option>")
@@ -74,8 +79,10 @@ $("#design").change(function() {
 	$("#color").prop("selectedIndex", 0);
 	// check which design is selected, and show colors accordingly.
 	if ($("#design option:selected").text() === "Theme - JS Puns") {
+		$("#color").show();
 		showColors(jsPunsString);
 	} else {
+		$("#color").show();
 		showColors(heartJS);
 	}
 });
