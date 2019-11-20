@@ -1,6 +1,8 @@
 // Define variables + regex conditions:
 const jsPunsString = /JS Puns/;
 const heartJS = /I ♥ JS/;
+const nameInput = $("#name");
+const emailInput = $("#mail");
 
 let totalCost = 0;
 
@@ -10,7 +12,7 @@ $("#name").focus();
 // Target the ‘Other’ input field, and hide it initially, so that it will display if JavaScript is disabled, but be hidden initially with JS.
 $("#other-title").hide();
 
-// If the other selection is made, show the other input field, else hide it. 
+// If the other selection is made, show the other input field, else hide it.
 $("#title").change(function() {
 	checkTitleName = $("#title option:selected").text();
 	if (checkTitleName === "Other") {
@@ -18,23 +20,7 @@ $("#title").change(function() {
 	} else {
 		$("#other-title").hide();
 	}
-	
-})
-
-// $("#payment").change(function() {
-// 	checkPaymentMethod = $("#payment option:selected").text();
-// 	$("#credit-card").hide();
-// 	$("#bitcoin").hide();
-// 	$("#paypal").hide();
-// 	if (checkPaymentMethod === "Credit Card") {
-// 		$("#credit-card").show();
-// 	} else if (checkPaymentMethod === "PayPal") {
-// 		$("#paypal").show();
-// 	} else if (checkPaymentMethod === "Bitcoin") {
-// 		$("#bitcoin").show();
-// 	}
-// });
-
+});
 
 // T-Shirt section
 // The goal for the t-shirt section is to filter the available "Color" options by the selected theme in the "Design" field. Doing this ensures that the user cannot select an invalid combination of values for the "Design" and "Color" fields.
@@ -176,86 +162,70 @@ $("#payment").change(function() {
 	}
 });
 
+// Form Validation and Validation Messages
+// function isValidName(name){
+// 	return /^[a-z]+$/.test(name);
+// }
 
+// function isValidEmail(email) {
+// 	return /^[^@]+@[^@.]+\.[a-z]+$/i.test(email);
+//   }
 
 // Form Validation and Validation Messages
-// There are numerous ways to accomplish this part of the project. You could try to cram all the
-// programming for this section into the submit event listener.
-// You could try to validate all of the required fields in a single function and then call that function
-// in a submit listener.
-// You could separate the validation and validation messages into separate tasks handled
-// independently of each other. But it's generally a good idea to start with the simplest possible
-// solution. Here’s an example of a straightforward approach that takes it one step at a time.
+// There are numerous ways to accomplish this part of the project. You could try to cram all the programming for this section into the submit event listener. You could try to validate all of the required fields in a single function and then call that function in a submit listener.
 
+// You could separate the validation and validation messages into separate tasks handled independently of each other. But it's generally a good idea to start with the simplest possible solution. Here’s an example of a straightforward approach that takes it one step at a time.
 
-// There are three sections of the form that are always required: name, email and activities. 
+// There are three sections of the form that are always required: name, email and activities. The credit section—comprised of three inputs—only needs to be validated if “credit card” is the selected payment method. To keep things simple, you can create a function to validate each required section, as well as add and remove a validation error indicator of some sort. Each required section will need to be tested to see if it meets certain criteria, which are detailed in the project instructions. If the criteria are not met, the validation function should add a validation error indication for that field and return false. Else, the function should remove any validation error indicator and return true.
 
-// The credit section—comprised of three inputs—only needs to be validated if “credit card” is the
-// selected payment method. To keep things simple, you can create a function to validate each
-// required section, as well as add and remove a validation error indicator of some sort. Each
-// required section will need to be tested to see if it meets certain criteria, which are detailed in the
-// project instructions. If the criteria are not met, the validation function should add a validation
-// error indication for that field and return false. Else, the function should remove any validation
-// error indicator and return true.
-
-
-// ● Create a separate validation function for each of the required form fields or sections
+// Create a separate validation function for each of the required form fields or sections
 // ○ Name
 
+function isValidName() {
 
-function validName(nameField){
-	if(nameField === "Mike"){
+	if (/[\w\-'\s]+/.test($("#name").val())) {
 		$("input#name").css("backgroundColor", "green");
-		console.log("Mike");
+		console.log("True");
 	} else {
-		$("input#name").css("border", "2px solid red").after("<p style='color:red;'>Please enter a valid name!</p>");
-		console.log("Not Mike");
+		$("input#name").css("backgroundColor", "red");
+		console.log("False");
 	}
 }
 
-validName("Bob");
+$("#name").on("input", () => {
+	isValidName();
+});
 
+function isValidEmail() {
+	if (/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test($("#mail").val())) {
+		$("input#mail").css("backgroundColor", "green");
+		console.log("True");
+	} else {
+		$("input#mail").css("backgroundColor", "red");
+		console.log("False");
+	}
+}
 
+$("#mail").on("input", () => {
+	isValidEmail();
+});
 
-// ● Each validation function will accomplish a similar set of tasks for its required field
-// ○ Use a conditional to check if the input value meets the requirements for that
-// input as stated in the project instructions.
-// ○ If the criteria are not met, add an error indicator and return false.
-// ○ If the criteria are met, remove any error indicators and return true.
-// ○ NOTE: A common error indicator for an invalid field is to turn the input or form
-// section’s border red. But an even better approach is to append an element to
-// the DOM near the input or section, give it some friendly error message, and
-// show it when the field is invalid, and hide it when the field is valid.
-
-
+// ○ Email
 
 // ○ Activity Section
+
 // ○ Credit Card Number (only validated if the payment method is “credit card”)
 // ○ Zip Code (only validated if the payment method is “credit card”)
 // ○ CVV (only validated if the payment method is “credit card”)
 
-
-// ● Each validation function will accomplish a similar set of tasks for its required field
-// ○ Use a conditional to check if the input value meets the requirements for that
-// input as stated in the project instructions.
+// Each validation function will accomplish a similar set of tasks for its required field
+// ○ Use a conditional to check if the input value meets the requirements for that input as stated in the project instructions.
 // ○ If the criteria are not met, add an error indicator and return false.
 // ○ If the criteria are met, remove any error indicators and return true.
-// ○ NOTE: A common error indicator for an invalid field is to turn the input or form
-// section’s border red. But an even better approach is to append an element to
-// the DOM near the input or section, give it some friendly error message, and
-// show it when the field is invalid, and hide it when the field is valid.
+// ○ NOTE: A common error indicator for an invalid field is to turn the input or form section’s border red. But an even better approach is to append an element to the DOM near the input or section, give it some friendly error message, and show it when the field is invalid, and hide it when the field is valid.
 
+// With the individual validation functions complete, a single master validation function can now be created to test them all with a single function call. If all the individual validation functions return true, then the master validation function should return true as well. And if any individual validation functions return false, then the master function should do the same.
 
-// ● With the individual validation functions complete, a single master validation function can
-// now be created to test them all with a single function call. If all the individual validation
-// functions return true, then the master validation function should return true as well.
-// And if any individual validation functions return false, then the master function should
-// do the same.
-// ○ NOTE: Remember, the name, email and activity section need to be validated on
-// every submission attempt regardless of which payment method has been
-// selected. But the three credit card fields will only need to be validated if “credit
-// card” is the selected payment method.
-// Now that you have the individual validation functions and a function to orchestrate the
-// whole validation process, we need a way to kick things off. For example, a submit event
-// listener on the form element could prevent the default submission behavior of the form if
-// any of the fields are invalid, or false.
+// ○ NOTE: Remember, the name, email and activity section need to be validated on every submission attempt regardless of which payment method has been selected. But the three credit card fields  will only need to be validated if “credit card” is the selected payment method.
+
+// Now that you have the individual validation functions and a function to orchestrate the whole validation process, we need a way to kick things off. For example, a submit event listener on the form element could prevent the default submission behavior of the form if any of the fields are invalid, or false.
