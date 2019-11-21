@@ -1,10 +1,19 @@
 // Define variables + regex conditions:
 const jsPunsString = /JS Puns/;
 const heartJS = /I ♥ JS/;
-const nameInput = $("#name");
-const emailInput = $("#mail");
-
 let totalCost = 0;
+
+// Require a properly formated credit card, based on the following requirements: https://www.regular-expressions.info/creditcard.html
+const creditCardRegex = /^(?:4[0-9]{12}(?:[0-9]{3})?|(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\d{3})\d{11})$/;
+
+// Require email format, as per collected here: https://emailregex.com/
+const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+// Check to make sure the Postal Code follows the correct formatting 
+const postalRegex = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
+
+// Match CVV for 3 or 4 numbers
+const cvvRegex = /^[0-9]{3,4}$/
 
 // Use jQuery to select the 'Name' input element and place focus on it.
 $("#name").focus();
@@ -182,50 +191,142 @@ $("#payment").change(function() {
 // ○ Name
 
 function isValidName() {
-
-	if (/[\w\-'\s]+/.test($("#name").val())) {
+	if ($("#name").val() === "") {
+		$("input#name").css("backgroundColor", "red");
+		return false;
+	} else if (/[\w\-'\s]+/.test($("#name").val())) {
 		$("input#name").css("backgroundColor", "green");
-		console.log("True");
+		return true;
 	} else {
 		$("input#name").css("backgroundColor", "red");
-		console.log("False");
+		return false;
 	}
 }
 
-$("#name").on("input", () => {
+$("#name").on("input blur", () => {
 	isValidName();
 });
 
 function isValidEmail() {
-	if (/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test($("#mail").val())) {
+	if ($("#mail").val() === "") {
+		$("input#mail").css("backgroundColor", "red");
+		return false;
+	} else if (
+		emailRegex.test(
+			$("#mail").val()
+		)
+	) {
 		$("input#mail").css("backgroundColor", "green");
-		console.log("True");
+		return true;
 	} else {
 		$("input#mail").css("backgroundColor", "red");
-		console.log("False");
+		return false;
 	}
 }
 
-$("#mail").on("input", () => {
+$("#mail").on("input blur", () => {
 	isValidEmail();
 });
 
-// ○ Email
-
 // ○ Activity Section
 
-// ○ Credit Card Number (only validated if the payment method is “credit card”)
-// ○ Zip Code (only validated if the payment method is “credit card”)
-// ○ CVV (only validated if the payment method is “credit card”)
+function isActivitiesSelected() {
+	if ($(".activities input:checked").length > 0) {
+		$(".activities").css("backgroundColor", "green");
+		return true;
+	} else {
+		$(".activities").css("backgroundColor", "red");
+		return false;
+	}
+}
 
-// Each validation function will accomplish a similar set of tasks for its required field
-// ○ Use a conditional to check if the input value meets the requirements for that input as stated in the project instructions.
-// ○ If the criteria are not met, add an error indicator and return false.
-// ○ If the criteria are met, remove any error indicators and return true.
-// ○ NOTE: A common error indicator for an invalid field is to turn the input or form section’s border red. But an even better approach is to append an element to the DOM near the input or section, give it some friendly error message, and show it when the field is invalid, and hide it when the field is valid.
+$(".activities").on("input", () => {
+	isActivitiesSelected();
+});
+
+// Credit Cards
+
+function validateCreditCardNumber() {
+	if ($("#payment option:selected").text() === "Credit Card") {
+		if ($("#cc-num").val() === "") {
+			$("#cc-num").css("backgroundColor", "red");
+			return false;
+		} else if (creditCardRegex.test($("#cc-num").val())) {
+			$("#cc-num").css("backgroundColor", "green");
+			return true;
+		} else {
+			$("#cc-num").css("backgroundColor", "red");
+			return false;
+		}
+	} else {
+		return true;
+	}
+}
+
+$("#cc-num").on("input blur", () => {
+	validateCreditCardNumber();
+});
+
+function validatePostalCode() {
+	if ($("#payment option:selected").text() === "Credit Card") {
+		if ($("#zip").val() === "") {
+			$("#zip").css("backgroundColor", "red");
+			return false;
+		} else if (postalRegex.test($("#zip").val())) {
+			$("#zip").css("backgroundColor", "green")
+			return true;
+		} else {
+			$("#zip").css("backgroundColor", "red");
+			return false;
+		}
+	} else {
+		return true;
+	}
+}
+
+$("#zip").on("input blur", () => {
+	validatePostalCode();
+});
+
+function validateCVV() {
+	if ($("#payment option:selected").text() === "Credit Card") {
+		if ($("#cvv").val() === "") {
+			$("#cvv").css("backgroundColor", "red");
+			return false;
+		} else if ((cvvRegex.test($("#cvv").val()))){
+			$("#cvv").css("backgroundColor", "green");
+			return true;
+		} else {
+			$("#cvv").css("backgroundColor", "red");
+			return false;
+		}
+	} else {
+		return true;
+	}
+}
+
+$("#cvv").on("input blur", () => {
+	validateCVV();
+});
+
+function testAllConditions(){
+	if(isValidName() && isValidEmail() && isActivitiesSelected() && validateCreditCardNumber() && validatePostalCode() && validateCVV()){
+		return true;
+	} else {
+		alert("You have some outstanding errors");
+	}
+}
 
 // With the individual validation functions complete, a single master validation function can now be created to test them all with a single function call. If all the individual validation functions return true, then the master validation function should return true as well. And if any individual validation functions return false, then the master function should do the same.
 
 // ○ NOTE: Remember, the name, email and activity section need to be validated on every submission attempt regardless of which payment method has been selected. But the three credit card fields  will only need to be validated if “credit card” is the selected payment method.
 
 // Now that you have the individual validation functions and a function to orchestrate the whole validation process, we need a way to kick things off. For example, a submit event listener on the form element could prevent the default submission behavior of the form if any of the fields are invalid, or false.
+
+$("form").submit(function(e) {
+	e.preventDefault();
+	if (testAllConditions()) {
+		this.submit(); 
+	}
+	
+});
