@@ -4,7 +4,7 @@ const heartJS = /I ♥ JS/;
 let totalCost = 0;
 
 // Regex for a name
-const nameRegex = /[\w\-'\s]+/;
+const nameRegex = /^([a-zA-Z ]){2,30}$/;
 
 // Require email format, as per collected here: https://emailregex.com/
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -44,7 +44,9 @@ $("#design")
 
 // Hide Color form until selected
 
-$("#color").hide();
+// $("#color").hide();
+// $('label[for="color"]').hide();
+$("#colors-js-puns").hide();
 
 // ● Update the “Color” field to read “Please select a T-shirt theme”.
 $("#color")
@@ -75,10 +77,10 @@ $("#design").change(function() {
 	$("#color").prop("selectedIndex", 0);
 	// check which design is selected, and show colors accordingly.
 	if ($("#design option:selected").text() === "Theme - JS Puns") {
-		$("#color").show();
+		$("#colors-js-puns").show();
 		showColors(jsPunsString);
 	} else {
-		$("#color").show();
+		$("#colors-js-puns").show();
 		showColors(heartJS);
 	}
 });
@@ -157,33 +159,42 @@ $("#payment").change(function() {
 		$("#credit-card").show();
 	} else if (checkPaymentMethod === "PayPal") {
 		$("#paypal").show();
+		$("#cvv-error").remove();
+		$("#zip-error").remove();
+		$("#ccnumber-error").remove();
 	} else if (checkPaymentMethod === "Bitcoin") {
 		$("#bitcoin").show();
+		$("#cvv-error").remove();
+		$("#zip-error").remove();
+		$("#ccnumber-error").remove();
 	}
 });
 
 // Form Validation and Validation Messages
 
-// create an error handler
-function showError(element, message){
-	$(".error").remove();
-	element.after("<div class='error'><p style='font-weight: bold; color:red;'>" + message + "</p></div>");
-}
+// create an error handler ( defunct, and not working so removed from code. Will look at again in the future to see about a refactor)
+// function showError(element, message){
+// 	// $(".error").remove();
+// 	console.log(element);
+// 	$(element).after("<div id='" + element + "-error' style='font-weight: bold; color:red;'>" + message + "</div>");
+// }
 
 // Validation function for name
 
 function isValidName() {
 	if ($("#name").val() === "") {
 		$("input#name").css("borderColor", "red");
-		showError($("input#name"), "Name is Missing");
+		$("#name-error").remove();
+		$("input#name").after("<div id='name-error' style='font-weight: bold; color:red;'>Name is Missing</div>");
 		return false;
 	} else if (nameRegex.test($("#name").val())) {
 		$("input#name").css("borderColor", "green");
-		$(".error").remove();
+		$("#name-error").remove();
 		return true;
 	} else {
-		showError($("input#name"), "Your name is not formatted correctly");
 		$("input#name").css("borderColor", "red");
+		$("#name-error").remove();
+		$("input#name").after("<div id='name-error' style='font-weight: bold; color:red;'>Your name is not formatted correctly</div>");
 		return false;
 	}
 }
@@ -196,8 +207,9 @@ $("#name").on("input blur", () => {
 
 function isValidEmail() {
 	if ($("#mail").val() === "") {
-		showError($("input#mail"), "Your email address cannot be empty");
 		$("input#mail").css("borderColor", "red");
+		$("#email-error").remove();
+		$("input#mail").after("<div id='email-error' style='font-weight: bold; color:red;'>Your email address cannot be empty</div>");
 		return false;
 	} else if (
 		emailRegex.test(
@@ -205,11 +217,12 @@ function isValidEmail() {
 		)
 	) {
 		$("input#mail").css("borderColor", "green");
-		$(".error").remove();
+		$("#email-error").remove();
 		return true;
 	} else {
-		showError($("input#mail"), "Email address must be formatted properly");
 		$("input#mail").css("borderColor", "red");
+		$("#email-error").remove();
+		$("input#mail").after("<div id='email-error' style='font-weight: bold; color:red;'>Email address must be formatted properly</div>");
 		return false;
 	}
 }
@@ -222,10 +235,11 @@ $("#mail").on("input blur", () => {
 // Validation function for Activity
 function isActivitiesSelected() {
 	if ($(".activities input:checked").length > 0) {
-		$(".error").remove();
+		$("#activity-error").remove();
 		return true;
 	} else {
-		showError($(".activities"), "Please select at least one activity!");
+		$("#activity-error").remove();
+		$(".activities").after("<div id='activity-error' style='font-weight: bold; color:red;'>Please select at least one activity!</div>");
 		return false;
 	}
 }
@@ -239,16 +253,19 @@ $(".activities").on("input", () => {
 function validateCreditCardNumber() {
 	if ($("#payment option:selected").text() === "Credit Card") {
 		if ($("#cc-num").val() === "") {
-			showError($("#credit-card"), "Credit Card number cannot be empty");
 			$("#cc-num").css("borderColor", "red");
+			$("#ccnumber-error").remove();
+			$("#credit-card").after("<div id='ccnumber-error' style='font-weight: bold; color:red;'>Credit Card number cannot be empty</div>");
+	
 			return false;
 		} else if (creditCardRegex.test($("#cc-num").val())) {
 			$("#cc-num").css("borderColor", "green");
-			$(".error").remove();
+			$("#ccnumber-error").remove();
 			return true;
 		} else {
-			showError($("#credit-card"), "Credit Card must be a valid number");
 			$("#cc-num").css("borderColor", "red");
+			$("#ccnumber-error").remove();
+			$("#credit-card").after("<div id='ccnumber-error' style='font-weight: bold; color:red;'>Credit Card must be a valid number</div>");
 			return false;
 		}
 	} else {
@@ -264,15 +281,19 @@ function validatePostalCode() {
 	if ($("#payment option:selected").text() === "Credit Card") {
 		if ($("#zip").val() === "") {
 			$("#zip").css("borderColor", "red");
-			showError($("#credit-card"), "Postal code cannot be empty");
+			$("#zip-error").remove();
+			$("#credit-card").after("<div id='zip-error' style='font-weight: bold; color:red;'>Postal code cannot be empty</div>");
+
 			return false;
 		} else if (postalRegex.test($("#zip").val())) {
 			$("#zip").css("borderColor", "green")
-			$(".error").remove();
+			$("#zip-error").remove();
 			return true;
 		} else {
 			$("#zip").css("borderColor", "red");
-			showError($("#credit-card"), "Postal Code must be in the format of A1A1A1");
+			$("#zip-error").remove();
+			$("#credit-card").after("<div id='zip-error' style='font-weight: bold; color:red;'>Postal Code must be in the format of A1A1A1</div>");
+
 			return false;
 		}
 	} else {
@@ -288,15 +309,20 @@ function validateCVV() {
 	if ($("#payment option:selected").text() === "Credit Card") {
 		if ($("#cvv").val() === "") {
 			$("#cvv").css("borderColor", "red");
-			showError($("#credit-card"), "CVV cannot be empty");
+			// showError($("#credit-card"), "CVV cannot be empty");
+			$("#cvv-error").remove();
+			$("#credit-card").after("<div id='cvv-error' style='font-weight: bold; color:red;'>CVV cannot be empty</div>");
 			return false;
 		} else if ((cvvRegex.test($("#cvv").val()))){
 			$("#cvv").css("borderColor", "green");
-			$(".error").remove();
+			$("#cvv-error").remove();
 			return true;
 		} else {
 			$("#cvv").css("borderColor", "red");
-			showError($("#credit-card"), "CVV must be 3 or 4 numbers");
+			// showError($("#credit-card"), "CVV must be 3 or 4 numbers");
+			$("#cvv-error").remove();
+			$("#credit-card").after("<div id='cvv-error' style='font-weight: bold; color:red;'>CVV must be 3 or 4 numbers</div>");
+
 			return false;
 		}
 	} else {
@@ -311,6 +337,13 @@ $("#cvv").on("input blur", () => {
 // Master validation check, return true, only if all functions return true. 
 
 function testAllConditions(){
+	isValidName();
+	isValidEmail();
+	isActivitiesSelected();
+	validateCVV();
+	validatePostalCode();
+	validateCreditCardNumber();
+
 	if(isValidName() && isValidEmail() && isActivitiesSelected() && validateCreditCardNumber() && validatePostalCode() && validateCVV()){
 		$(".error").remove();
 		return true;
